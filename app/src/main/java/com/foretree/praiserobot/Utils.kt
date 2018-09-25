@@ -1,6 +1,8 @@
 package com.foretree.praiserobot
 
 import android.annotation.TargetApi
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -20,14 +22,30 @@ object Utils {
     fun performSetText(window: AccessibilityNodeInfo, viewId: String, comment: String):Boolean {
         return window.findAccessibilityNodeInfosByText(viewId).run {
             if (this != null && !isEmpty()) {
-                get(0).performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
-                    putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, comment)
-                })
+                val info = get(0)
+                info.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                    val bundle = Bundle().apply {
+                        putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, comment)
+                    }
+                    info.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, bundle)
+                } else {
+                    info.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
+                    info.performAction(AccessibilityNodeInfo.ACTION_PASTE)
+                }
             } else {
                 false
             }
         }
     }
+
+    @JvmStatic
+    fun performClip(context: Context, text: String) {
+        val clipboard: ClipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.primaryClip = ClipData.newPlainText("text", text)
+    }
+
+
     @JvmStatic
     fun performClickByText(window: AccessibilityNodeInfo, text: String):Boolean {
         return window.findAccessibilityNodeInfosByText(text).run {

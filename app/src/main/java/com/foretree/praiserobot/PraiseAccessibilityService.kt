@@ -16,7 +16,7 @@ class PraiseAccessibilityService: AccessibilityService() {
         serviceInfo = AccessibilityServiceInfo().apply {
             eventTypes = AccessibilityEvent.TYPES_ALL_MASK
             feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
-            packageNames = arrayOf(PackageEnum.ELEME.name)
+            packageNames = PackageEnum.values().map { it.packageName }.toTypedArray()
             notificationTimeout = 100
         }
         Log.d("==>", "PraiseAccessibilityService ==> onServiceConnected")
@@ -27,9 +27,15 @@ class PraiseAccessibilityService: AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
-        when(PackageEnum.valueOf(event.packageName.toString())) {
+        when(PackageEnum.from(event.packageName.toString())) {
             PackageEnum.ELEME -> {
                 PraiseHelper.handleEleMe(event, rootInActiveWindow?:return)
+            }
+            PackageEnum.JD -> {
+                PraiseHelper.handleJD(event, rootInActiveWindow?:return)
+            }
+            else -> {
+                //error
             }
         }
     }
