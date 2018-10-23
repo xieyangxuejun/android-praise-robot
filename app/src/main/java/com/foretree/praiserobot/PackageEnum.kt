@@ -7,6 +7,7 @@ package com.foretree.praiserobot
 enum class PackageEnum(val packageName: String) {
     JD("com.jingdong.app.mall"),
     ELEME("me.ele"),
+    NOW("com.tencent.now"),
     ERROR("error");
 
     companion object {

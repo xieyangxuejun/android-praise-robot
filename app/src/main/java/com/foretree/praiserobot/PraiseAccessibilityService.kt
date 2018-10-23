@@ -29,10 +29,14 @@ class PraiseAccessibilityService: AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         when(PackageEnum.from(event.packageName.toString())) {
             PackageEnum.ELEME -> {
-                PraiseHelper.handleEleMe(event, rootInActiveWindow?:return)
+                PraiseAccessibilityAction.handleEleMe(event, rootInActiveWindow?:return)
             }
             PackageEnum.JD -> {
-                PraiseHelper.handleJD(event, rootInActiveWindow?:return)
+                PraiseAccessibilityAction.handleJD(event, rootInActiveWindow?:return)
+            }
+            //now live
+            PackageEnum.NOW -> {
+                PraiseAccessibilityAction.handleNOW(event, rootInActiveWindow?:return)
             }
             else -> {
                 //error

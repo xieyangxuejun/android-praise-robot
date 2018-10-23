@@ -17,10 +17,17 @@ import android.view.accessibility.AccessibilityNodeInfo
  */
 object Utils {
 
+    //get info list
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    @JvmStatic
+    fun getAccessibilityNodeInfosByViewId(window: AccessibilityNodeInfo, viewId: String): MutableList<AccessibilityNodeInfo>? {
+        return window.findAccessibilityNodeInfosByViewId(viewId)
+    }
+
     @JvmStatic
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     fun performSetText(window: AccessibilityNodeInfo, viewId: String, comment: String):Boolean {
-        return window.findAccessibilityNodeInfosByText(viewId).run {
+        return window.findAccessibilityNodeInfosByViewId(viewId).run {
             if (this != null && !isEmpty()) {
                 val info = get(0)
                 info.performAction(AccessibilityNodeInfo.ACTION_FOCUS)

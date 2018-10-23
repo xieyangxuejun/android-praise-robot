@@ -11,7 +11,7 @@ import android.view.accessibility.AccessibilityNodeInfo
  * Created by silen on 2018/9/24 0:29
  * Copyright (c) 2018 in FORETREE
  */
-object PraiseHelper {
+object PraiseAccessibilityAction {
     @JvmStatic
     private val mHandler = Handler()
     @JvmStatic
@@ -73,6 +73,31 @@ object PraiseHelper {
                         Utils.performClickByText(window, "评价得")
                     }, 400)
                 }
+            }
+        }
+    }
+
+    private var nowLivePreNickname: CharSequence = ""
+    fun handleNOW(event: AccessibilityEvent, window: AccessibilityNodeInfo) {
+        when(event.eventType) {
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                Utils.getAccessibilityNodeInfosByViewId(window, "com.tencent.now:id/bij").run {
+                    if (this != null && this.isNotEmpty()) {
+                        val contentText = this[size - 1].text
+                        val nickname = contentText.toString().replace("来了", "").trim()
+                        if (contentText != null && contentText.endsWith("来了") && nowLivePreNickname != nickname) {
+                            Log.d("==>", "text=$contentText" + ", address=${this}")
+                            Utils.performSetText(window, "com.tencent.now:id/ajc", "欢迎 $nickname")
+                            mHandler.postDelayed({
+                                Utils.performClickByViewId(window, "com.tencent.now:id/asv")
+                                nowLivePreNickname = nickname
+                            }, 100)
+                        }
+                    }
+                }
+            }
+            AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
+
             }
         }
     }
