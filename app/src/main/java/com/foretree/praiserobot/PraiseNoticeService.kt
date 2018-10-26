@@ -28,13 +28,13 @@ class PraiseNoticeService : Service() {
 
     override fun onCreate() {
         Log.d("==>", "onCreate")
-        showNotification("好评君", "自动好评-点击打开设置页面")
+        showNotification(applicationContext.getString(R.string.app_name), applicationContext.getString(R.string.app_content))
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d("==>", "onStartCommand")
-        showNotification("好评君", "自动好评-点击打开设置页面")
+        showNotification(applicationContext.getString(R.string.app_name), applicationContext.getString(R.string.app_content))
         return super.onStartCommand(intent, flags, startId)
     }
 

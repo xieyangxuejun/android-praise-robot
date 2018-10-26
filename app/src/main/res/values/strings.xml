@@ -1,4 +1,21 @@
 <resources>
-    <string name="app_name">好评君</string>
+    <string name="app_name">Now直播场控</string>
+    <string name="app_content">Now直播场控-点击打开服务页面</string>
     <string name="description">自动好评</string>
+    <string name="label_settings">配置</string>
+    <string name="label_start_welcome">开启欢迎</string>
+    <string name="label_thx_gift">感谢礼物</string>
+    <string name="label_thx_attention">感谢关注</string>
+
+    <string-array name="array_rank">
+        <item>全部</item>
+        <item>贵族</item>
+    </string-array>
+    <string-array name="array_time">
+        <item>30s</item>
+        <item>60s</item>
+        <item>90s</item>
+        <item>180s</item>
+        <item>360s</item>
+    </string-array>
 </resources>
