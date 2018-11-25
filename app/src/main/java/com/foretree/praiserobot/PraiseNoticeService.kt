@@ -1,9 +1,6 @@
 package com.foretree.praiserobot
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -64,7 +61,11 @@ class PraiseNoticeService : Service() {
         }
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         builder.setContentIntent(pendingIntent)
-        notificationManager.notify(0, builder.build())
+        val notification = builder.build().apply {
+            // Notification.FLAG_ONGOING_EVENT; // 设置常驻 Flag
+            flags = Notification.FLAG_NO_CLEAR
+        }
+        notificationManager.notify(0, notification)
     }
 
 }
