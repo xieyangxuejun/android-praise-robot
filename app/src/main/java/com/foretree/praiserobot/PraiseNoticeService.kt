@@ -59,7 +59,9 @@ class PraiseNoticeService : Service() {
                 .setContentText(content)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(false)
-        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+            this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         builder.setContentIntent(pendingIntent)
         notificationManager.notify(0, builder.build())

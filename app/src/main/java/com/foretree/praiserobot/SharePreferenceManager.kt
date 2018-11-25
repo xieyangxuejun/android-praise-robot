@@ -23,6 +23,8 @@ class SharePreferenceManager(private val context: Context) {
         @JvmStatic
         val KEY_FANS = "fans"
         @JvmStatic
+        val KEY_FLOWER = "flower"
+        @JvmStatic
         val KEY_ATTENTION_CONTENT = "attention_content"
         @JvmStatic
         val NAME_LIVE_SETTINGS = "now_live_settings"
@@ -55,6 +57,9 @@ class SharePreferenceManager(private val context: Context) {
     fun putFollow(boolean: Boolean) = mSp.putBoolean(KEY_FOLLOW, boolean).save()
     fun getFans() = mSp.getBoolean(KEY_FANS, false)
     fun putFans(boolean: Boolean) = mSp.putBoolean(KEY_FANS, boolean).save()
+
+    fun getFlowerSetting() = mSp.getBoolean(KEY_FLOWER, false)
+    fun putFlowerSetting(boolean: Boolean) = mSp.putBoolean(KEY_FLOWER, boolean).save()
 
     fun getAttentionContent(): String = mSp.getString(KEY_ATTENTION_CONTENT, "")
     fun putAttentionContent(string: String) = mSp.putString(KEY_ATTENTION_CONTENT, string).save()

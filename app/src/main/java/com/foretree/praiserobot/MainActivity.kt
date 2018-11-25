@@ -60,6 +60,13 @@ class MainActivity : AppCompatActivity() {
                     putFans(isChecked)
                 }
             }
+            //抢花花
+            switch_flower.run {
+                isChecked = getFlowerSetting()
+                setOnCheckedChangeListener { _, isChecked ->
+                    putFlowerSetting(isChecked)
+                }
+            }
             et_attention.setText(getAttentionContent())
             btn_save.setOnClickListener {
                 putAttentionContent(et_attention.text.toString())

@@ -19,82 +19,98 @@
     <LinearLayout
         android:id="@+id/ll_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_pid">
-
-        <Switch
-            android:id="@+id/switch1"
+        app:layout_constraintTop_toBottomOf="@+id/tv_pid"
+        android:layout_height="wrap_content">
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:switchPadding="5dp"
-            android:text="@string/label_start_welcome"
-            android:thumbTextPadding="10dp" />
+            android:layout_height="wrap_content">
 
-        <Spinner
-            android:id="@+id/spinner"
+            <Switch
+                android:id="@+id/switch1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:switchPadding="5dp"
+                android:text="@string/label_start_welcome"
+                android:thumbTextPadding="10dp" />
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/array_rank"
+                android:padding="10dp" />
+
+            <Switch
+                android:id="@+id/switch2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:switchPadding="5dp"
+                android:text="@string/label_thx_gift"
+                android:thumbTextPadding="10dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/array_rank"
-            android:padding="10dp" />
+            android:layout_height="wrap_content">
 
-        <Switch
-            android:id="@+id/switch2"
+            <Switch
+                android:id="@+id/switch3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:switchPadding="5dp"
+                android:text="@string/label_thx_attention"
+                android:thumbTextPadding="10dp" />
+
+            <Switch
+                android:id="@+id/switch4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:padding="10dp"
+                android:switchPadding="5dp"
+                android:text="粉  丝  团"
+                android:thumbTextPadding="10dp" />
+
+            <Spinner
+                android:id="@+id/spinner_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/array_time"
+                android:padding="10dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:switchPadding="5dp"
-            android:text="@string/label_thx_gift"
-            android:thumbTextPadding="10dp" />
-
+            android:layout_height="wrap_content">
+            <Switch
+                android:id="@+id/switch_flower"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:switchPadding="5dp"
+                android:text="@string/label_thx_flower"
+                android:thumbTextPadding="10dp" />
+        </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_layout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_layout">
 
-        <Switch
-            android:id="@+id/switch3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:switchPadding="5dp"
-            android:text="@string/label_thx_attention"
-            android:thumbTextPadding="10dp" />
 
-        <Switch
-            android:id="@+id/switch4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:padding="10dp"
-            android:switchPadding="5dp"
-            android:text="粉  丝  团"
-            android:thumbTextPadding="10dp" />
 
-        <Spinner
-            android:id="@+id/spinner_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/array_time"
-            android:padding="10dp" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_layout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_layout2">
+        app:layout_constraintTop_toBottomOf="@+id/ll_layout">
 
         <EditText
             android:id="@+id/et_attention"

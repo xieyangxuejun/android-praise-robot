@@ -6,6 +6,7 @@
     <string name="label_start_welcome">开启欢迎</string>
     <string name="label_thx_gift">感谢礼物</string>
     <string name="label_thx_attention">感谢关注</string>
+    <string name="label_thx_flower">领取花花</string>
 
     <string-array name="array_rank">
         <item>全部</item>

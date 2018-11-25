@@ -1,7 +1,9 @@
 package com.foretree.praiserobot
 
 import android.accessibilityservice.AccessibilityService
+import android.annotation.TargetApi
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
@@ -12,6 +14,7 @@ import android.view.accessibility.AccessibilityNodeInfo
  * Created by silen on 2018/9/24 0:29
  * Copyright (c) 2018 in FORETREE
  */
+@TargetApi(Build.VERSION_CODES.DONUT)
 object PraiseAccessibilityAction {
     @JvmStatic
     private val mHandler = Handler()
@@ -88,12 +91,46 @@ object PraiseAccessibilityAction {
     private var mAttentionContent: CharSequence = ""
     private var mShowTimeContent: Boolean = true
     private var mGiftArray: ArrayList<String> = arrayListOf()
+    private var mIsGetFlower = false
     fun handleNOW2(event: AccessibilityEvent, window: AccessibilityNodeInfo, context: Context) {
         when (event.eventType) {
             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
 
                 //------------欢迎
                 SharePreferenceManager.getInstance(context).run {
+                    // 自动领花花
+                    if (getFlowerSetting()) {
+                        if (9 < window.childCount && !mIsGetFlower) {
+                            val child = window.getChild(8)
+                            val childNext = window.getChild(9)
+                            val class_name = "com.tencent.tbs.core.webkit.tencent.TencentWebViewProxy\$InnerWebView"
+                            if (child != null && childNext != null
+                                    && class_name == child.className
+                                    && class_name != childNext.className) {
+                                Log.d("===>", child.className.toString())
+                                window.getChild(6).performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                                mIsGetFlower = true
+                            }
+                        }
+                        if (mIsGetFlower) {
+                            mHandler.postDelayed({
+                                Utils.getAccssibilityNodeInfosByText(window, "专属礼物")?.run {
+                                    if (isNotEmpty()) {
+                                        this[0].parent.run {
+                                            for (i in 0..this.childCount) {
+                                                val child = getChild(i)
+                                                if (child != null && "android.widget.ImageView" == child.className) {
+                                                    child.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 500)
+                            mIsGetFlower = false
+                        }
+                    }
+
                     if (getGift()) {
                         //礼物
                         Utils.getAccssibilityNodeInfosByText(window, "送一个")?.run {
@@ -101,7 +138,7 @@ object PraiseAccessibilityAction {
                                 forEach { info ->
                                     val key = info.parent.run {
                                         "${getChild(1).text?:""}${getChild(2).text?:""}"
-                                                .replace("一个", "")
+                                                .replace("一个", "的")
                                     }
                                     if (key.isNotEmpty() && !mGiftArray.contains(key)) {
                                         mGiftArray.add(0, key)
