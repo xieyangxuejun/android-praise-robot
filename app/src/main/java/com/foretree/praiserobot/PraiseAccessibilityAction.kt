@@ -100,34 +100,23 @@ object PraiseAccessibilityAction {
                 SharePreferenceManager.getInstance(context).run {
                     // 自动领花花
                     if (getFlowerSetting()) {
-                        if (9 < window.childCount && !mIsGetFlower) {
-                            val child = window.getChild(8)
-                            val childNext = window.getChild(9)
-                            val class_name = "com.tencent.tbs.core.webkit.tencent.TencentWebViewProxy\$InnerWebView"
-                            if (child != null && childNext != null
-                                    && class_name == child.className
-                                    && class_name != childNext.className) {
-                                Log.d("===>", child.className.toString())
-                                window.getChild(6).performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                        val childCount = window.childCount
+                        if (9 < childCount && !mIsGetFlower) {
+                            var start = 0
+                            var end = 0
+                            for (index in 0 until childCount) {
+                                val child = window.getChild(index)
+                                if ("android.widget.ViewFlipper" == child.className) {
+                                    start = index
+                                } else if ("com.tencent.tbs.core.webkit.tencent.TencentWebViewProxy\$InnerWebView" == child.className) {
+                                    end = index
+                                    break
+                                }
+                            }
+                            if (start != 0 && end - start > 2) {
+                                window.getChild(start + 1).performAction(AccessibilityNodeInfo.ACTION_CLICK)
                                 mIsGetFlower = true
                             }
-                        }
-                        if (mIsGetFlower) {
-                            mHandler.postDelayed({
-                                Utils.getAccssibilityNodeInfosByText(window, "专属礼物")?.run {
-                                    if (isNotEmpty()) {
-                                        this[0].parent.run {
-                                            for (i in 0..this.childCount) {
-                                                val child = getChild(i)
-                                                if (child != null && "android.widget.ImageView" == child.className) {
-                                                    child.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }, 500)
-                            mIsGetFlower = false
                         }
                     }
 
@@ -137,7 +126,7 @@ object PraiseAccessibilityAction {
                             try {
                                 forEach { info ->
                                     val key = info.parent.run {
-                                        "${getChild(1).text?:""}${getChild(2).text?:""}"
+                                        "${getChild(1).text ?: ""}${getChild(2).text ?: ""}"
                                                 .replace("一个", "的")
                                     }
                                     if (key.isNotEmpty() && !mGiftArray.contains(key)) {
@@ -151,7 +140,7 @@ object PraiseAccessibilityAction {
                                             sendMsg(window, "感谢 $key")
                                             mGiftArray.remove(key)
                                         }
-                                    }  else {
+                                    } else {
 
                                     }
                                 } else if (mGiftArray.size > 2) {
@@ -228,7 +217,8 @@ object PraiseAccessibilityAction {
                                 .run {
                                     replace("s", "").toLong() * 1000
                                 }
-                    } catch (e:Exception) {}
+                    } catch (e: Exception) {
+                    }
                     getAttentionContent().run {
                         if (isNotEmpty() && mShowTimeContent && timeTips != 0L) {
                             mHandler.postDelayed({
@@ -242,6 +232,18 @@ object PraiseAccessibilityAction {
             }
             AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
 
+            }
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                if (mIsGetFlower) {
+                    mHandler.postDelayed({
+                        Log.d("===>", "领花花")
+                        val child = window.getChild(3)
+                        if (child != null && "android.widget.ImageView" == child.className) {
+                            child.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                        }
+                    }, 500)
+                    mIsGetFlower = false
+                }
             }
         }
     }
