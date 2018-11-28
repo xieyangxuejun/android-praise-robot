@@ -221,16 +221,16 @@ object PraiseAccessibilityAction {
                     }
                     getAttentionContent().run {
                         if (isNotEmpty() && mShowTimeContent && timeTips != 0L) {
-                            val name = window.findAccessibilityNodeInfosByText("人")
-                                    .let {
-                                        try {
+                            var name = ""
+                            try {
+                                name = window.findAccessibilityNodeInfosByText("人")
+                                        .let {
                                             it[0].parent.getChild(1).text.toString()
-                                        } catch (e: Exception) {
-                                            ""
                                         }
-                                    }
+                            } catch (e: Exception) {
+                            }
                             mHandler.postDelayed({
-                                sendMsg(window, this.format(name))
+                                sendMsg(window, if (name.isEmpty()) this else this.format(name))
                                 mShowTimeContent = true
                             }, timeTips)
                             mShowTimeContent = false
