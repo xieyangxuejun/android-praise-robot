@@ -36,7 +36,7 @@ class PraiseAccessibilityService: AccessibilityService() {
             }
             //now live
             PackageEnum.NOW -> {
-                PraiseAccessibilityAction.handleNOW(event, rootInActiveWindow?:return)
+                PraiseAccessibilityAction.handleNOW2(event, rootInActiveWindow?:return, applicationContext)
             }
             else -> {
                 //error

@@ -1,9 +1,6 @@
 package com.foretree.praiserobot
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -28,13 +25,13 @@ class PraiseNoticeService : Service() {
 
     override fun onCreate() {
         Log.d("==>", "onCreate")
-        showNotification("好评君", "自动好评-点击打开设置页面")
+        showNotification(applicationContext.getString(R.string.app_name), applicationContext.getString(R.string.app_content))
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d("==>", "onStartCommand")
-        showNotification("好评君", "自动好评-点击打开设置页面")
+        showNotification(applicationContext.getString(R.string.app_name), applicationContext.getString(R.string.app_content))
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -59,10 +56,16 @@ class PraiseNoticeService : Service() {
                 .setContentText(content)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(false)
-        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+            this.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         builder.setContentIntent(pendingIntent)
-        notificationManager.notify(0, builder.build())
+        val notification = builder.build().apply {
+            // Notification.FLAG_ONGOING_EVENT; // 设置常驻 Flag
+            flags = Notification.FLAG_NO_CLEAR
+        }
+        notificationManager.notify(0, notification)
     }
 
 }
