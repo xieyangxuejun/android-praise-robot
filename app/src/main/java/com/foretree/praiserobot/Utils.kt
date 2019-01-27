@@ -11,12 +11,21 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeInfo.FOCUS_INPUT
+import java.io.InputStream
 
 /**
  * Created by silen on 2018/9/23 23:38
  * Copyright (c) 2018 in FORETREE
  */
 object Utils {
+
+    @JvmStatic
+    fun readStream(input: InputStream)
+            : String {
+        val bytes = ByteArray(input.available())
+        input.read(bytes)
+        return String(bytes)
+    }
 
     @JvmStatic
     fun getAccssibilityNodeInfosByText(window: AccessibilityNodeInfo, content: String): MutableList<AccessibilityNodeInfo>? {
