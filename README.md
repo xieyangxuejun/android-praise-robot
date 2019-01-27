@@ -4,4 +4,4 @@
 - 新增京东自动好评, 有问题
 - 新增分支 now-live-robot, Now直播场控助手 2018/10/26
 	- 效果：
-	![image](https://raw.githubusercontent.com/android-praise-robot/tree/master/shotscreen.jpg)
+	![image](https://raw.githubusercontent.com/android-praise-robot/master/shotscreen.jpg)
