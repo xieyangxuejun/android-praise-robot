@@ -63,19 +63,19 @@ object PraiseAccessibilityAction {
                             Utils.performClickByViewIdMore(window, "me.ele:id/five")
                             mHandler.postDelayed({
                                 Utils.performSetText(window, "me.ele:id/edit_text", "好评!!!")
-                            }, 400)
-                        }, 400)
+                            }, DEFAULT_MILLIS)
+                        }, DEFAULT_MILLIS)
                         mHandler.postDelayed({
                             Utils.performClickByText(window, "提交评价")
                             event.source.performAction(AccessibilityService.GLOBAL_ACTION_BACK)
-                        }, 400)
-                    }, 400)
+                        }, DEFAULT_MILLIS)
+                    }, DEFAULT_MILLIS)
                 } else if (className.startsWith("me.ele.application.ui.home.d")
                         || className.startsWith("me.ele.application.ui.home.HomeActivity")
                         || className.startsWith("me.ele.ny")) {
                     mHandler.postDelayed({
                         Utils.performClickByText(window, "评价得")
-                    }, 400)
+                    }, DEFAULT_MILLIS)
                 }
             }
         }
@@ -137,7 +137,7 @@ object PraiseAccessibilityAction {
                                 if (size == 0) {
                                     if (mGiftArray.size == 2 || mGiftArray.size == 1) {
                                         for (key in mGiftArray) {
-                                            sendMsg(window, "感谢 $key")
+                                            sendMsg(window, "感谢 $key!")
                                             mGiftArray.remove(key)
                                         }
                                     } else {
@@ -147,7 +147,7 @@ object PraiseAccessibilityAction {
                                     mGiftArray.forEachIndexed { index, content ->
                                         if (index >= 2) {
                                             val key = mGiftArray[index]
-                                            sendMsg(window, "感谢 $key")
+                                            sendMsg(window, "感谢 $key!")
                                             mGiftArray.remove(key)
                                         }
                                     }
@@ -162,14 +162,17 @@ object PraiseAccessibilityAction {
                     if (getWelcome()) {
                         if (getWelcomeVIP()) {
                             //贵族
-                            Utils.getAccssibilityNodeInfosByText(window, "icon").run {
+                            Utils.getAccssibilityNodeInfosByText(window, "icon  ").run {
                                 if (this != null && this.isNotEmpty()) {
                                     val contentText = this[size - 1].text
                                     if (contentText != null
                                             && !contentText.contains(":")
                                             && !mBijVipPreContent.contains(contentText)) {
 
-                                        val comment = "欢迎 ${contentText.toString().replace("icon  ", "").trim()}"
+                                        val comment = "欢迎 ${contentText.toString()
+                                                .replace("icon  ", "")
+                                                .replace("来了", "")
+                                                .trim()}\uD83D\uDE17"
                                         sendMsg(window, comment)
                                         mBijVipPreContent = contentText
                                     }
@@ -183,7 +186,7 @@ object PraiseAccessibilityAction {
                                             && !contentText.contains(":")
                                             && !mBijPreContent.contains(contentText)) {
 
-                                        val comment = "欢迎 ${contentText.toString().replace("来了", "").trim()}"
+                                        val comment = "欢迎 ${contentText.toString().replace("来了", "").trim()}\uD83D\uDE17"
                                         sendMsg(window, comment)
                                         mBijPreContent = contentText
                                     }
@@ -200,7 +203,7 @@ object PraiseAccessibilityAction {
                                         && !contentText.contains(":")
                                         && !mAttentionContent.contains(contentText)) {
 
-                                    val comment = "谢谢 ${contentText.toString().replace("关注了主播", "").trim()} 的关注哟"
+                                    val comment = "谢谢 ${contentText.toString().replace("关注了主播", "").trim()} 的关注哟\uD83D\uDE17"
                                     sendMsg(window, comment)
                                     Log.d("==>2", comment)
                                     mAttentionContent = contentText
@@ -221,16 +224,17 @@ object PraiseAccessibilityAction {
                     }
                     getAttentionContent().run {
                         if (isNotEmpty() && mShowTimeContent && timeTips != 0L) {
-                            var name = ""
-                            try {
-                                name = window.findAccessibilityNodeInfosByText("人")
-                                        .let {
-                                            it[0].parent.getChild(1).text.toString()
-                                        }
-                            } catch (e: Exception) {
-                            }
+//                            var name = ""
+//                            try {
+//                                name = window.findAccessibilityNodeInfosByText("人")
+//                                        .let {
+//                                            it[0].parent.getChild(1).text.toString()
+//                                        }
+//                            } catch (e: Exception) {
+//                            }
                             mHandler.postDelayed({
-                                sendMsg(window, if (name.isEmpty()) this else this.format(name))
+                                //                                sendMsg(window, if (name.isEmpty()) this else this.format(name))
+                                sendMsg(window, this)
                                 mShowTimeContent = true
                             }, timeTips)
                             mShowTimeContent = false
@@ -260,10 +264,10 @@ object PraiseAccessibilityAction {
     fun sendMsg(window: AccessibilityNodeInfo, comment: String) {
         //not empty
         if (comment.isNotEmpty()) {
-            Utils.performSetTextFromFocus(window, comment)
             mHandler.postDelayed({
+                Utils.performSetTextFromFocus(window, comment)
                 Utils.performClickByText(window, "发送")
-            }, 100)
+            }, 0)
         }
     }
 
