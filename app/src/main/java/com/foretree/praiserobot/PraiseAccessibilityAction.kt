@@ -8,6 +8,8 @@ import android.os.Handler
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import io.reactivex.functions.Consumer
+import java.util.regex.Pattern
 
 /**
  * ele, 每日优先
@@ -86,159 +88,124 @@ object PraiseAccessibilityAction {
 
     }
 
-    private var mBijPreContent: CharSequence = ""
-    private var mBijVipPreContent: CharSequence = ""
+    private var mWelcomeNickname: CharSequence = ""
+    private var mWelcomeContent: CharSequence = ""
+    private var mWelcomeVipContent: CharSequence = ""
     private var mAttentionContent: CharSequence = ""
     private var mShowTimeContent: Boolean = true
     private var mGiftArray: ArrayList<String> = arrayListOf()
     private var mIsGetFlower = false
+    private var mPreNickname: CharSequence = ""
+    //最新的文字防止刷屏
+    private var mLastContent: CharSequence = ""
+    private var mLastMVPContent: CharSequence = ""
+    //机器人请求
+    private var mRobotRequest = RobotRequest()
+    private var mPreQuestion = ""
+
     fun handleNOW2(event: AccessibilityEvent, window: AccessibilityNodeInfo, context: Context) {
         when (event.eventType) {
             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
 
                 //------------欢迎
                 SharePreferenceManager.getInstance(context).run {
-                    // 自动领花花
-                    if (getFlowerSetting()) {
-                        val childCount = window.childCount
-                        if (9 < childCount && !mIsGetFlower) {
-                            var start = 0
-                            var end = 0
-                            for (index in 0 until childCount) {
-                                val child = window.getChild(index)
-                                if ("android.widget.ViewFlipper" == child.className) {
-                                    start = index
-                                } else if ("com.tencent.tbs.core.webkit.tencent.TencentWebViewProxy\$InnerWebView" == child.className) {
-                                    end = index
-                                    break
-                                }
-                            }
-                            if (start != 0 && end - start > 2) {
-                                window.getChild(start + 1).performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                                mIsGetFlower = true
-                            }
-                        }
-                    }
-
-                    if (getGift()) {
-                        //礼物
-                        Utils.getAccssibilityNodeInfosByText(window, "送一个")?.run {
-                            try {
-                                forEach { info ->
-                                    val key = info.parent.run {
-                                        "${getChild(1).text ?: ""}${getChild(2).text ?: ""}"
-                                                .replace("一个", "的")
-                                    }
-                                    if (key.isNotEmpty() && !mGiftArray.contains(key)) {
-                                        mGiftArray.add(0, key)
-                                    }
-                                }
-                                //消失
-                                if (size == 0) {
-                                    if (mGiftArray.size == 2 || mGiftArray.size == 1) {
-                                        for (key in mGiftArray) {
-                                            sendMsg(window, "感谢 $key!")
-                                            mGiftArray.remove(key)
-                                        }
-                                    } else {
-
-                                    }
-                                } else if (mGiftArray.size > 2) {
-                                    mGiftArray.forEachIndexed { index, content ->
-                                        if (index >= 2) {
-                                            val key = mGiftArray[index]
-                                            sendMsg(window, "感谢 $key!")
-                                            mGiftArray.remove(key)
-                                        }
-                                    }
-                                }
-
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-                    }
-
-                    if (getWelcome()) {
-                        if (getWelcomeVIP()) {
-                            //贵族
-                            Utils.getAccssibilityNodeInfosByText(window, "icon  ").run {
-                                if (this != null && this.isNotEmpty()) {
-                                    val contentText = this[size - 1].text
-                                    if (contentText != null
-                                            && !contentText.contains(":")
-                                            && !mBijVipPreContent.contains(contentText)) {
-
-                                        val comment = "欢迎 ${contentText.toString()
-                                                .replace("icon  ", "")
-                                                .replace("来了", "")
-                                                .trim()}\uD83D\uDE17"
-                                        sendMsg(window, comment)
-                                        mBijVipPreContent = contentText
-                                    }
-                                }
-                            }
-                        } else {
-                            Utils.getAccssibilityNodeInfosByText(window, "来了").run {
-                                if (this != null && this.isNotEmpty()) {
-                                    val contentText = this[size - 1].text
-                                    if (contentText != null
-                                            && !contentText.contains(":")
-                                            && !mBijPreContent.contains(contentText)) {
-
-                                        val comment = "欢迎 ${contentText.toString().replace("来了", "").trim()}\uD83D\uDE17"
-                                        sendMsg(window, comment)
-                                        mBijPreContent = contentText
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // -----------关注
-                    if (getFollow()) {
-                        Utils.getAccssibilityNodeInfosByText(window, "关注了主播").run {
-                            if (this != null && this.isNotEmpty()) {
-                                val contentText = this[size - 1].text
-                                if (contentText != null
-                                        && !contentText.contains(":")
-                                        && !mAttentionContent.contains(contentText)) {
-
-                                    val comment = "谢谢 ${contentText.toString().replace("关注了主播", "").trim()} 的关注哟\uD83D\uDE17"
-                                    sendMsg(window, comment)
-                                    Log.d("==>2", comment)
-                                    mAttentionContent = contentText
-                                }
-                            }
-                            //
-                        }
-                    }
-                    //定时
-                    var timeTips = 0L
                     try {
-                        timeTips = context.resources
-                                .getStringArray(R.array.array_time)[getTipsTimePosition()]
-                                .run {
-                                    replace("s", "").toLong() * 1000
-                                }
-                    } catch (e: Exception) {
-                    }
-                    getAttentionContent().run {
-                        if (isNotEmpty() && mShowTimeContent && timeTips != 0L) {
-//                            var name = ""
-//                            try {
-//                                name = window.findAccessibilityNodeInfosByText("人")
-//                                        .let {
-//                                            it[0].parent.getChild(1).text.toString()
-//                                        }
-//                            } catch (e: Exception) {
-//                            }
-                            mHandler.postDelayed({
-                                //                                sendMsg(window, if (name.isEmpty()) this else this.format(name))
-                                sendMsg(window, this)
-                                mShowTimeContent = true
-                            }, timeTips)
-                            mShowTimeContent = false
+                        //定时
+                        actionScheduleTips(context, window)
+                        Utils.getAccssibilityNodeInfosByText(window, " ").apply {
+                            if (this != null && this.isNotEmpty()) {
+                                val content = get(size - 1).text
+                                if (mLastContent.toString().equals(content.toString())) return
+                                else mLastContent = content
+                            }
                         }
+                        //机器人
+                        if (getChkRobot()) {
+                            Utils.getAccssibilityNodeInfosByText(window, "QQQ").run {
+                                if (this != null && this.isNotEmpty()) {
+                                    val contentText = this[size - 1].text
+                                    if (contentText != null && contentText.contains(": QQQ")) {
+                                        val ques = contentText.split("QQQ")[1]
+                                        if (ques.isNotEmpty() && ques != mPreQuestion) {
+                                            mPreQuestion = ques
+                                            mRobotRequest.post(ques, Consumer {
+                                                sendMsg(window, it)
+                                            })
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        //设置昵称
+                        if (getNicknameSettings()) {
+                            Utils.getAccssibilityNodeInfosByText(window, "设置亲密昵称=").run {
+                                if (this != null && this.isNotEmpty()) {
+                                    val contentText = this[size - 1].text
+                                    if (contentText != null && contentText.contains(":")) {
+                                        val list = contentText.split("设置亲密昵称=")
+                                        val key = list[0].replace(":", "").trim()
+                                        val nick = list[1]
+                                        if (key.isNotEmpty()
+                                                && nick.isNotEmpty() && mPreNickname != nick) {
+                                            putSavedNickname(key, nick)
+                                            sendMsg(window, "${nick}设置成功!!!")
+                                            mPreNickname = nick
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (getShowMvpSettings()) {
+                            Utils.getAccssibilityNodeInfosByText(window, "获得MVP称号").run {
+                                if (this != null && this.isNotEmpty()) {
+                                    val contentText = this[size - 1].text
+                                    if (contentText != null
+                                            && contentText.contains(":")
+                                            && contentText.toString() != mLastMVPContent) {
+                                        val regex = "(?<=\\[)(\\S+)(?=\\])|(?<=【)[^】]*"
+                                        val pattern = Pattern.compile(regex)
+                                        val matcher = pattern.matcher(contentText)
+                                        while (matcher.find()) {
+                                            val group = matcher.group(0)
+                                            if (group.isNotEmpty()) {
+                                                val randomText = Utils.randomText(group)
+                                                sendMsg(window, randomText)
+                                                mLastMVPContent = contentText
+                                                break
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // 自动领花花
+                        if (getFlowerSetting()) {
+                            actionGetFlower(window, context)
+                        }
+
+                        if (getGift()) {
+                            //礼物
+                            actionShowGift(window, context)
+                        }
+
+                        if (getWelcome()) {
+                            if (getWelcomeVIP()) {
+                                //贵族
+                                welcomeVIP(window, context)
+                            } else {
+                                welcomeVIP(window, context)
+                                welcomeNormal(window, context)
+                            }
+                        }
+                        // -----------关注
+                        if (getFollow()) {
+                            actionFollow(window, context)
+                        }
+                    } catch (e: Exception) {
+                        //igore
                     }
                 }
             }
@@ -247,11 +214,15 @@ object PraiseAccessibilityAction {
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 if (mIsGetFlower) {
+
                     mHandler.postDelayed({
-                        Log.d("===>", "领花花")
-                        val child = window.getChild(3)
-                        if (child != null && "android.widget.ImageView" == child.className) {
-                            child.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                        try {
+                            val child = window.getChild(3)
+                            if (child != null && "android.widget.ImageView" == child.className) {
+                                child.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     }, 500)
                     mIsGetFlower = false
@@ -260,85 +231,173 @@ object PraiseAccessibilityAction {
         }
     }
 
-    @JvmStatic
-    fun sendMsg(window: AccessibilityNodeInfo, comment: String) {
+    private fun SharePreferenceManager.actionScheduleTips(context: Context, window: AccessibilityNodeInfo) {
+        //定时
+        var timeTips = 0L
+        try {
+            timeTips = context.resources
+                    .getStringArray(R.array.array_time)[getTipsTimePosition()]
+                    .run {
+                        replace("s", "").toLong() * 1000
+                    }
+        } catch (e: Exception) {
+        }
+        getAttentionContent().run {
+            if (isNotEmpty() && mShowTimeContent && timeTips != 0L) {
+                //                            var name = ""
+                //                            try {
+                //                                name = window.findAccessibilityNodeInfosByText("人")
+                //                                        .let {
+                //                                            it[0].parent.getChild(1).text.toString()
+                //                                        }
+                //                            } catch (e: Exception) {
+                //                            }
+                mHandler.postDelayed({
+                    //                                sendMsg(window, if (name.isEmpty()) this else this.format(name))
+                    sendMsg(window, this)
+                    mShowTimeContent = true
+                }, timeTips)
+                mShowTimeContent = false
+            }
+        }
+    }
+
+    private fun actionGetFlower(window: AccessibilityNodeInfo, context: Context) {
+        val childCount = window.childCount
+        if (9 < childCount && !mIsGetFlower) {
+            var start = 0
+            var end = 0
+            for (index in 0 until childCount) {
+                val child = window.getChild(index)
+                if ("android.widget.ViewFlipper" == child.className) {
+                    start = index
+                } else if ("com.tencent.tbs.core.webkit.tencent.TencentWebViewProxy\$InnerWebView" == child.className) {
+                    end = index
+                    break
+                }
+            }
+            if (start != 0 && end - start > 2 ) {
+                window.getChild(start + 1).apply {
+                    if ("新人主播" != text.toString()) {
+                        performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                        mIsGetFlower = true
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getNickname(context: Context, key: String?): String {
+        if (key == null) return ""
+        return SharePreferenceManager.getInstance(context).getSavedNickname(key) ?: key
+    }
+
+    private fun actionShowGift(window: AccessibilityNodeInfo, context: Context) {
+        Utils.getAccssibilityNodeInfosByText(window, "送一个")?.run {
+            try {
+                forEach { info ->
+                    val key = info.parent.run {
+                        "${getNickname(context, getChild(1).text?.toString())}${getChild(2).text
+                                ?: ""}"
+                                .replace("一个", "的")
+                    }
+                    if (key.isNotEmpty() && !mGiftArray.contains(key)) {
+                        mGiftArray.add(0, key)
+                    }
+                }
+                //消失
+                if (size == 0) {
+                    if (mGiftArray.size == 2 || mGiftArray.size == 1) {
+                        for (key in mGiftArray) {
+                            sendMsg(window, "谢谢 $key!")
+                            mGiftArray.remove(key)
+                        }
+                    } else {
+
+                    }
+                } else if (mGiftArray.size > 2) {
+                    mGiftArray.forEachIndexed { index, _ ->
+                        if (index >= 2) {
+                            val key = mGiftArray[index]
+                            sendMsg(window, "谢谢 $key!")
+                            mGiftArray.remove(key)
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun actionFollow(window: AccessibilityNodeInfo, context: Context) {
+        Utils.getAccssibilityNodeInfosByText(window, "关注了主播").run {
+            if (this != null && this.isNotEmpty()) {
+                val contentText = this[size - 1].text
+                if (contentText != null
+                        && !contentText.contains(":")
+                        && !mAttentionContent.contains(contentText)) {
+
+                    val nickname = contentText.toString().replace("关注了主播", "").trim()
+                    val comment = "谢谢 ${getNickname(context, nickname)} 的关注哟\uD83D\uDE17"
+                    sendMsg(window, comment)
+                    mAttentionContent = contentText
+                }
+            }
+            //
+        }
+    }
+
+    private fun welcomeNormal(window: AccessibilityNodeInfo, context: Context) {
+        Utils.getAccssibilityNodeInfosByText(window, "来了").run {
+            if (this != null && this.isNotEmpty()) {
+                val contentText = this[size - 1].text
+                if (contentText != null
+                        && !contentText.contains(":")
+                        && !mWelcomeContent.contains(contentText)) {
+                    sendWelcomeMsg(context, contentText.toString(), window)
+                    mWelcomeContent = contentText
+                }
+            }
+        }
+    }
+
+    private fun sendWelcomeMsg(context: Context, contentText: String, window: AccessibilityNodeInfo) {
+        val nickname = clearNickname(contentText)
+        if (nickname != mWelcomeNickname) {
+            val comment = "欢迎 ${getNickname(context, nickname)} 大驾光临\uD83D\uDE17"
+            sendMsg(window, comment)
+            mWelcomeNickname = nickname
+        }
+    }
+
+    private fun clearNickname(contentText: String): String = contentText
+            .replace("icon  ", "")
+            .replace("来了", "")
+            .trim()
+
+    private fun welcomeVIP(window: AccessibilityNodeInfo, context: Context) {
+        Utils.getAccssibilityNodeInfosByText(window, "icon  ").run {
+            if (this != null && this.isNotEmpty()) {
+                val contentText = this[size - 1].text
+                if (contentText != null
+                        && !contentText.contains(":")
+                        && !mWelcomeVipContent.contains(contentText)) {
+                    sendWelcomeMsg(context, contentText.toString(), window)
+                    mWelcomeVipContent = contentText
+                }
+            }
+        }
+    }
+
+    private fun sendMsg(window: AccessibilityNodeInfo, comment: String) {
         //not empty
         if (comment.isNotEmpty()) {
             mHandler.postDelayed({
                 Utils.performSetTextFromFocus(window, comment)
                 Utils.performClickByText(window, "发送")
             }, 0)
-        }
-    }
-
-    private
-    var currentGiftNickname: CharSequence = ""
-
-    @Deprecated("动态id,不能用")
-    fun handleNOW(event: AccessibilityEvent, window: AccessibilityNodeInfo) {
-        when (event.eventType) {
-            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
-                //动态id "com.tencent.now:id/bij"
-                Utils.getAccessibilityNodeInfosByViewId(window, "com.tencent.now:id/bij").run {
-                    if (this != null && this.isNotEmpty()) {
-                        val contentText = this[size - 1].text
-
-                        if (contentText != null
-                                && !contentText.contains(":")
-                                && mBijPreContent != contentText) {
-                            //欢迎
-                            val comment = contentText.toString().let {
-                                //欢迎
-                                if (it.contains("来了")) {
-                                    "欢迎 ${it.replace("来了", "").trim()}"
-                                } else if (it.contains("关注了主播")) {  //关注
-                                    "谢谢 ${it.replace("关注了主播", "").trim()} 的关注"
-                                }
-                                ""
-                            }
-
-                            //not empty
-                            if (comment.isNotEmpty()) {
-                                Utils.performSetText(window,
-                                        "com.tencent.now:id/ajc",
-                                        comment)
-                                mHandler.postDelayed({
-                                    Utils.performClickByViewId(window, "com.tencent.now:id/asv")
-                                }, 100)
-                                mBijPreContent = contentText
-                            }
-                        }
-                    }
-                }
-                //礼物
-                Utils.getAccessibilityNodeInfosByViewId(window, "com.tencent.now:id/a7s").run {
-                    if (this != null && this.isNotEmpty()) {
-                        val contentText = this[size - 1].text
-                        try {
-                            val list = contentText.split("送了")
-                            val nickname = list[0].replace(" ", "")
-                            if (contentText != null && !contentText.contains(":") && nickname != currentGiftNickname) {
-                                Log.d("==>", "nickname=$nickname")
-                                mHandler.postDelayed({
-                                    Utils.performSetText(window, "com.tencent.now:id/ajc", "感谢 $nickname 的礼物")
-                                    mHandler.postDelayed({
-                                        Utils.performClickByViewId(window, "com.tencent.now:id/asv")
-                                    }, 100)
-                                }, 1500)
-                                currentGiftNickname = nickname
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-
-                //关注
-                ///Utils.getAccessibilityNodeInfosByViewId()
-            }
-            AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
-
-            }
         }
     }
 }

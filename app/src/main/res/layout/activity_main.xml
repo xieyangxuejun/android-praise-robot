@@ -19,11 +19,12 @@
     <LinearLayout
         android:id="@+id/ll_layout"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_pid"
-        android:layout_height="wrap_content">
+        app:layout_constraintTop_toBottomOf="@+id/tv_pid">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -78,18 +79,22 @@
                 android:text="粉  丝  团"
                 android:thumbTextPadding="10dp" />
 
-            <Spinner
-                android:id="@+id/spinner_time"
+            <Switch
+                android:id="@+id/s_robot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/array_time"
-                android:padding="10dp" />
+                android:checked="false"
+                android:padding="10dp"
+                android:switchPadding="5dp"
+                android:text="机器人"
+                android:thumbTextPadding="10dp" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
             <Switch
                 android:id="@+id/switch_flower"
                 android:layout_width="wrap_content"
@@ -98,24 +103,61 @@
                 android:switchPadding="5dp"
                 android:text="@string/label_thx_flower"
                 android:thumbTextPadding="10dp" />
+
+            <Switch
+                android:id="@+id/switch_nickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:switchPadding="5dp"
+                android:text="亲密昵称"
+                android:thumbTextPadding="10dp" />
+
+            <Switch
+                android:id="@+id/switch_mvp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:switchPadding="5dp"
+                android:text="MVP答谢"
+                android:thumbTextPadding="10dp" />
         </LinearLayout>
     </LinearLayout>
 
 
-
-
-
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/ll_layout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ll_layout">
 
+        <Spinner
+            android:id="@+id/spinner_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:entries="@array/array_time"
+            android:padding="10dp" />
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spinner_time"
+            android:layout_alignStart="@+id/spinner_time"
+            android:layout_alignLeft="@+id/spinner_time"
+            android:layout_alignEnd="@+id/spinner_time"
+            android:layout_alignRight="@+id/spinner_time"
+            android:text="保存" />
+
         <EditText
             android:id="@+id/et_attention"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/btn_save"
+            android:layout_toLeftOf="@+id/spinner_time"
             android:layout_weight="1"
             android:gravity="start|top"
             android:hint="请输入定时欢迎"
@@ -123,13 +165,7 @@
             android:padding="10dp"
             android:textSize="14sp" />
 
-        <Button
-            android:id="@+id/btn_save"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="保存" />
-
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/ll_layout4"

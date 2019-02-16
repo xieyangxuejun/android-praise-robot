@@ -11,13 +11,29 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeInfo.FOCUS_INPUT
+import java.io.BufferedReader
 import java.io.InputStream
+import java.io.InputStreamReader
+import java.util.*
+
 
 /**
  * Created by silen on 2018/9/23 23:38
  * Copyright (c) 2018 in FORETREE
  */
 object Utils {
+    @JvmStatic
+    val arrays = arrayOf(
+            "威武霸气",
+            "666"
+    )
+
+    @JvmStatic
+    fun randomText(name: String): String {
+        val r = Random().nextInt(3)
+        if (r == 2) return "给${name}打call"
+        return "$name${arrays[r]}"
+    }
 
     @JvmStatic
     fun readStream(input: InputStream)
@@ -25,6 +41,21 @@ object Utils {
         val bytes = ByteArray(input.available())
         input.read(bytes)
         return String(bytes)
+    }
+    fun readStream2(input: InputStream)
+            : String {
+        val reader = BufferedReader(InputStreamReader(input))
+        try {
+            val results = StringBuilder()
+            while (true) {
+                val line = reader.readLine() ?: break
+                results.append(line)
+            }
+
+            return results.toString()
+        } finally {
+            reader.close()
+        }
     }
 
     @JvmStatic

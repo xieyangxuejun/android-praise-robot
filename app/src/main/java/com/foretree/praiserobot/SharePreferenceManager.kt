@@ -25,13 +25,26 @@ class SharePreferenceManager(private val context: Context) {
         @JvmStatic
         val KEY_FLOWER = "flower"
         @JvmStatic
+        val KEY_NICKNAME = "key_nickname"
+        @JvmStatic
+        val KEY_SHOW_MVP = "key_show_mvp"
+        @JvmStatic
         val KEY_ATTENTION_CONTENT = "attention_content"
+        @JvmStatic
+        val KEY_CHK_ROBOT = "key_chk_robot"
         @JvmStatic
         val NAME_LIVE_SETTINGS = "now_live_settings"
 
         @SuppressLint("StaticFieldLeak")
         @JvmStatic
         private var mInstance: SharePreferenceManager? = null
+
+        //设置昵称
+        @JvmStatic
+        val KEY_NICKNAME_SAVED = "key_nickname_saved"
+
+        @JvmStatic
+        val NICKNAME_MAP = hashMapOf<String, String>()
 
         @JvmStatic
         fun getInstance(context: Context): SharePreferenceManager {
@@ -46,6 +59,10 @@ class SharePreferenceManager(private val context: Context) {
     private val mSp: SharePreferenceUtil = SharePreferenceUtil.getPrefs(context, NAME_LIVE_SETTINGS)
 
 
+    fun getNicknameSettings() = mSp.getBoolean(KEY_WELCOME, true)
+    fun putNicknameSetting(boolean: Boolean) = mSp.putBoolean(KEY_NICKNAME, boolean).save()
+    fun getShowMvpSettings() = mSp.getBoolean(KEY_WELCOME, true)
+    fun putShowMvpSetting(boolean: Boolean) = mSp.putBoolean(KEY_SHOW_MVP, boolean).save()
     fun getWelcome() = mSp.getBoolean(KEY_WELCOME, true)
     fun putWelcome(boolean: Boolean) = mSp.putBoolean(KEY_WELCOME, boolean).save()
     fun putWelcomeVIP(boolean: Boolean) = mSp.putBoolean(KEY_VIP_WELCOME, boolean).save()
@@ -66,4 +83,19 @@ class SharePreferenceManager(private val context: Context) {
 
     fun getTipsTimePosition() = mSp.getInt(KEY_TIPS_TIME_POSITION, 0)
     fun putTipsTimePosition(position: Int) = mSp.putInt(KEY_TIPS_TIME_POSITION, position).save()
+
+    fun putSavedNickname(key: String, value: String) {
+        val newNickname = NICKNAME_MAP[key]
+        if (newNickname == null) {
+            NICKNAME_MAP[key] = value
+        } else {
+            NICKNAME_MAP[key] = value
+        }
+    }
+
+    fun getSavedNickname(key: String) = NICKNAME_MAP[key]
+
+
+    fun getChkRobot() = mSp.getBoolean(KEY_CHK_ROBOT, false)
+    fun putChkRobot(boolean: Boolean) = mSp.putBoolean(KEY_CHK_ROBOT, boolean).save()
 }

@@ -36,6 +36,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun initView() {
         SharePreferenceManager.getInstance(this).run {
+            //机器人
+            s_robot.run {
+                isChecked = getChkRobot()
+                setOnCheckedChangeListener { _, isChecked ->
+                    putChkRobot(isChecked)
+                }
+            }
             switch1.run {
                 isChecked = getWelcome()
                 setOnCheckedChangeListener { _, isChecked ->
@@ -65,6 +72,18 @@ class MainActivity : AppCompatActivity() {
                 isChecked = getFlowerSetting()
                 setOnCheckedChangeListener { _, isChecked ->
                     putFlowerSetting(isChecked)
+                }
+            }
+            switch_nickname.run {
+                isChecked = getFlowerSetting()
+                setOnCheckedChangeListener { _, isChecked ->
+                    putNicknameSetting(isChecked)
+                }
+            }
+            switch_mvp.run {
+                isChecked = getFlowerSetting()
+                setOnCheckedChangeListener { _, isChecked ->
+                    putShowMvpSetting(isChecked)
                 }
             }
             et_attention.setText(getAttentionContent())
